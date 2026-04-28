@@ -44,7 +44,7 @@ auth.onAuthStateChanged(usuario => {
         return
     }
     db.collection('usuarios').doc(usuario.uid).get().then(doc => {
-        if (!doc.exists || doc.data().rol !== 'mozo') {
+        if (!doc.exists || (doc.data().rol || '').toLowerCase() !== 'mozo') {
             auth.signOut()
             window.location.href = 'index.html'
             return

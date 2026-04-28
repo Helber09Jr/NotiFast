@@ -34,7 +34,7 @@ auth.onAuthStateChanged(usuario => {
             window.location.href = 'index.html'
             return
         }
-        const rol = doc.data().rol
+        const rol = (doc.data().rol || '').toLowerCase()
         if (!['cocina', 'barra', 'caja'].includes(rol)) {
             window.location.href = 'index.html'
             return

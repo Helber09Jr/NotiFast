@@ -25,13 +25,38 @@ const destinos = {
     mozo:   'mozo.html'
 }
 
+function restaurar_btn() {
+    btn_ingresar.disabled = false
+    btn_ingresar.textContent = 'Ingresar'
+}
+
+function mostrar_error(texto) {
+    error_login.textContent = texto
+    restaurar_btn()
+}
+
 auth.onAuthStateChanged(usuario => {
     if (!usuario) return
-    db.collection('usuarios').doc(usuario.uid).get().then(doc => {
-        if (doc.exists && destinos[doc.data().rol]) {
-            window.location.href = destinos[doc.data().rol]
-        }
-    })
+    db.collection('usuarios').doc(usuario.uid).get()
+        .then(doc => {
+            if (!doc.exists) {
+                auth.signOut()
+                mostrar_error('Usuario sin perfil. Pedile al admin que te registre.')
+                return
+            }
+            const rol = (doc.data().rol || '').toLowerCase()
+            if (!destinos[rol]) {
+                auth.signOut()
+                mostrar_error('Rol no reconocido: ' + rol)
+                return
+            }
+            window.location.href = destinos[rol]
+        })
+        .catch(err => {
+            auth.signOut()
+            mostrar_error('Error al verificar permisos (' + err.code + '). Revisá las reglas de Firestore.')
+            restaurar_btn()
+        })
 })
 
 form_login.addEventListener('submit', e => {
@@ -44,8 +69,6 @@ form_login.addEventListener('submit', e => {
         email_input.value.trim(),
         pass_input.value
     ).catch(() => {
-        error_login.textContent = 'Correo o contraseña incorrectos.'
-        btn_ingresar.disabled = false
-        btn_ingresar.textContent = 'Ingresar'
+        mostrar_error('Correo o contraseña incorrectos.')
     })
 })
