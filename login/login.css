@@ -1,0 +1,118 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --naranja: #FF6B00;
+    --oscuro: #1A1A2E;
+    --rojo: #E94560;
+    --blanco: #FFFFFF;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--oscuro);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contenedor-login {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+}
+
+.tarjeta-login {
+    background: var(--blanco);
+    border-radius: 20px;
+    padding: 40px 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.marca {
+    text-align: center;
+    margin-bottom: 36px;
+}
+
+.logo-texto {
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: var(--naranja);
+    letter-spacing: -1px;
+}
+
+.autor {
+    font-size: 0.82rem;
+    color: #bbb;
+    margin-top: 4px;
+}
+
+.campo-form {
+    margin-bottom: 20px;
+}
+
+.campo-form label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--oscuro);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.campo-form input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 2px solid #E5E5E5;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    color: var(--oscuro);
+}
+
+.campo-form input:focus {
+    border-color: var(--naranja);
+}
+
+#btn-ingresar {
+    width: 100%;
+    padding: 15px;
+    background: var(--naranja);
+    color: var(--blanco);
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+}
+
+#btn-ingresar:hover {
+    background: #e05f00;
+}
+
+#btn-ingresar:active {
+    transform: scale(0.97);
+}
+
+#btn-ingresar:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.mensaje-error {
+    color: var(--rojo);
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 14px;
+    min-height: 18px;
+    font-weight: 500;
+}

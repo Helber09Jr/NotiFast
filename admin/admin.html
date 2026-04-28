@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NotiFast — Admin</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <header class="cabecera">
+        <div class="marca-header">
+            <span class="logo-texto">NotiFast</span>
+            <span class="rol-badge">Admin</span>
+        </div>
+        <button id="btn-salir">Salir</button>
+    </header>
+
+    <main class="contenido">
+        <nav class="tabs">
+            <button class="tab activo" data-tab="mozos">Mozos</button>
+            <button class="tab" data-tab="historial">Historial</button>
+        </nav>
+
+        <section id="panel-mozos" class="panel activo">
+            <div class="tarjeta">
+                <h2>Agregar usuario</h2>
+                <form id="form-nuevo">
+                    <div class="fila-form">
+                        <input type="text" id="nombre-nuevo" placeholder="Nombre completo" required>
+                        <select id="rol-nuevo">
+                            <option value="mozo">Mozo</option>
+                            <option value="cocina">Cocina</option>
+                            <option value="barra">Barra</option>
+                            <option value="caja">Caja</option>
+                        </select>
+                    </div>
+                    <div class="fila-form">
+                        <input type="email" id="email-nuevo" placeholder="Correo electrónico" required autocomplete="off">
+                        <input type="password" id="pass-nuevo" placeholder="Contraseña (mín. 6)" required minlength="6" autocomplete="new-password">
+                    </div>
+                    <button type="submit" id="btn-crear">Crear usuario</button>
+                    <p id="msg-crear" class="mensaje-estado" role="alert"></p>
+                </form>
+            </div>
+
+            <div class="tarjeta">
+                <h2>Mozos registrados</h2>
+                <div id="lista-mozos" class="lista-mozos">
+                    <p class="estado-vacio">Cargando...</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="panel-historial" class="panel">
+            <div class="tarjeta">
+                <h2>Últimas alertas</h2>
+                <div id="lista-alertas" class="lista-alertas">
+                    <p class="estado-vacio">Cargando...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
