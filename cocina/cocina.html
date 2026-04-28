@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NotiFast — Cocina</title>
+    <link rel="stylesheet" href="cocina.css">
+</head>
+<body>
+    <header class="cabecera">
+        <div class="marca-header">
+            <span class="logo-texto">NotiFast</span>
+            <span id="badge-origen" class="rol-badge">Cocina</span>
+        </div>
+        <button id="btn-salir">Salir</button>
+    </header>
+
+    <main class="contenido">
+        <p class="titulo-llamar">¿A quién llamar?</p>
+        <div id="grilla-mozos" class="grilla-mozos">
+            <p class="estado-vacio">Cargando mozos...</p>
+        </div>
+    </main>
+
+    <div id="notif-enviada" class="notif-enviada oculto" role="status">
+        <span id="texto-enviada">✓ Alerta enviada</span>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="cocina.js"></script>
+</body>
+</html>
