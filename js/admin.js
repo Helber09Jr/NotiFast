@@ -27,13 +27,13 @@ const lista_alertas = document.getElementById('lista-alertas')
 
 auth.onAuthStateChanged(usuario => {
     if (!usuario) {
-        window.location.href = '../login/login.html'
+        window.location.href = 'index.html'
         return
     }
     db.collection('usuarios').doc(usuario.uid).get().then(doc => {
         if (!doc.exists || doc.data().rol !== 'admin') {
             auth.signOut()
-            window.location.href = '../login/login.html'
+            window.location.href = 'index.html'
         }
     })
     cargar_mozos()
@@ -41,7 +41,7 @@ auth.onAuthStateChanged(usuario => {
 })
 
 btn_salir.addEventListener('click', () => {
-    auth.signOut().then(() => window.location.href = '../login/login.html')
+    auth.signOut().then(() => window.location.href = 'index.html')
 })
 
 document.querySelectorAll('.tab').forEach(tab => {

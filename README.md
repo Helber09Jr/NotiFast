@@ -46,24 +46,24 @@ La comunicación es unidireccional y en tiempo real mediante listeners de Firest
 
 ```
 NotiFast/
-├── README.md
-├── login/
-│   ├── login.html
+├── index.html          ← login (raíz para despliegue en Vercel)
+├── admin.html
+├── cocina.html
+├── mozo.html
+├── css/
 │   ├── login.css
-│   └── login.js
-├── admin/
-│   ├── admin.html
 │   ├── admin.css
-│   └── admin.js
-├── cocina/
-│   ├── cocina.html
 │   ├── cocina.css
-│   └── cocina.js
-└── mozo/
-    ├── mozo.html
-    ├── mozo.css
-    └── mozo.js
+│   └── mozo.css
+├── js/
+│   ├── login.js
+│   ├── admin.js
+│   ├── cocina.js
+│   └── mozo.js
+└── README.md
 ```
+
+Los HTML están en la raíz para que Vercel los sirva directamente como rutas limpias (`/admin`, `/cocina`, `/mozo`). Los CSS van en `css/` y los JS en `js/`.
 
 Cada pantalla es completamente independiente: su propio HTML, CSS y JS. No existen archivos de lógica global compartidos.
 
@@ -71,26 +71,26 @@ Cada pantalla es completamente independiente: su propio HTML, CSS y JS. No exist
 
 ## Pantallas
 
-### `/login/` — Acceso
+### `index.html` — Acceso
 Formulario de email y contraseña. Al autenticarse, redirige automáticamente según el rol del usuario:
 
 | Rol | Destino |
 |---|---|
-| `admin` | `/admin/admin.html` |
-| `cocina` | `/cocina/cocina.html` |
-| `barra` | `/cocina/cocina.html` |
-| `caja` | `/cocina/cocina.html` |
-| `mozo` | `/mozo/mozo.html` |
+| `admin` | `admin.html` |
+| `cocina` | `cocina.html` |
+| `barra` | `cocina.html` |
+| `caja` | `cocina.html` |
+| `mozo` | `mozo.html` |
 
-### `/admin/` — Administración
+### `admin.html` — Administración
 Panel con dos secciones:
 - **Mozos**: crear usuarios (mozo, cocina, barra, caja), ver lista, eliminar
 - **Historial**: últimas 50 alertas enviadas
 
-### `/cocina/` — Panel de llamada
+### `cocina.html` — Panel de llamada
 Usada por roles `cocina`, `barra` y `caja`. Muestra una grilla de botones con el nombre de cada mozo activo. Un toque envía la alerta de forma instantánea.
 
-### `/mozo/` — Pantalla de espera
+### `mozo.html` — Pantalla de espera
 Pantalla completa en modo escucha. Al recibir una alerta:
 1. Muestra pantalla roja con el origen (COCINA / BARRA / CAJA)
 2. Vibra el dispositivo
@@ -152,7 +152,7 @@ const config_firebase = {
 }
 ```
 
-Los archivos con este bloque son: `login/login.js`, `admin/admin.js`, `cocina/cocina.js`, `mozo/mozo.js`.
+Los archivos con este bloque son: `js/login.js`, `js/admin.js`, `js/cocina.js`, `js/mozo.js`.
 
 ### 3. Reglas de seguridad de Firestore
 

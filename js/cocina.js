@@ -21,22 +21,22 @@ let origen_usuario = 'cocina'
 let timer_notif = null
 
 btn_salir.addEventListener('click', () => {
-    auth.signOut().then(() => window.location.href = '../login/login.html')
+    auth.signOut().then(() => window.location.href = 'index.html')
 })
 
 auth.onAuthStateChanged(usuario => {
     if (!usuario) {
-        window.location.href = '../login/login.html'
+        window.location.href = 'index.html'
         return
     }
     db.collection('usuarios').doc(usuario.uid).get().then(doc => {
         if (!doc.exists) {
-            window.location.href = '../login/login.html'
+            window.location.href = 'index.html'
             return
         }
         const rol = doc.data().rol
         if (!['cocina', 'barra', 'caja'].includes(rol)) {
-            window.location.href = '../login/login.html'
+            window.location.href = 'index.html'
             return
         }
         origen_usuario = rol

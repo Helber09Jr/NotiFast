@@ -18,11 +18,11 @@ const btn_ingresar = document.getElementById('btn-ingresar')
 const error_login = document.getElementById('error-login')
 
 const destinos = {
-    admin:  '../admin/admin.html',
-    cocina: '../cocina/cocina.html',
-    barra:  '../cocina/cocina.html',
-    caja:   '../cocina/cocina.html',
-    mozo:   '../mozo/mozo.html'
+    admin:  'admin.html',
+    cocina: 'cocina.html',
+    barra:  'cocina.html',
+    caja:   'cocina.html',
+    mozo:   'mozo.html'
 }
 
 auth.onAuthStateChanged(usuario => {

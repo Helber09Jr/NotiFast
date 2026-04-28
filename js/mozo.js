@@ -25,7 +25,7 @@ let procesando = false
 
 btn_salir.addEventListener('click', () => {
     if (listener_alertas) listener_alertas()
-    auth.signOut().then(() => window.location.href = '../login/login.html')
+    auth.signOut().then(() => window.location.href = 'index.html')
 })
 
 btn_confirmar.addEventListener('click', () => {
@@ -40,13 +40,13 @@ btn_confirmar.addEventListener('click', () => {
 
 auth.onAuthStateChanged(usuario => {
     if (!usuario) {
-        window.location.href = '../login/login.html'
+        window.location.href = 'index.html'
         return
     }
     db.collection('usuarios').doc(usuario.uid).get().then(doc => {
         if (!doc.exists || doc.data().rol !== 'mozo') {
             auth.signOut()
-            window.location.href = '../login/login.html'
+            window.location.href = 'index.html'
             return
         }
         nombre_mozo.textContent = doc.data().nombre
