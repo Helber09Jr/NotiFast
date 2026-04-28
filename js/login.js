@@ -44,7 +44,7 @@ auth.onAuthStateChanged(usuario => {
                 mostrar_error('Usuario sin perfil. Pedile al admin que te registre.')
                 return
             }
-            const rol = doc.data().rol
+            const rol = (doc.data().rol || '').toLowerCase()
             if (!destinos[rol]) {
                 auth.signOut()
                 mostrar_error('Rol no reconocido: ' + rol)

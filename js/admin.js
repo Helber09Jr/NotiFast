@@ -31,7 +31,7 @@ auth.onAuthStateChanged(usuario => {
         return
     }
     db.collection('usuarios').doc(usuario.uid).get().then(doc => {
-        if (!doc.exists || doc.data().rol !== 'admin') {
+        if (!doc.exists || (doc.data().rol || '').toLowerCase() !== 'admin') {
             auth.signOut()
             window.location.href = 'index.html'
         }
