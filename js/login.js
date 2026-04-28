@@ -1,10 +1,10 @@
 const config_firebase = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_PROYECTO.firebaseapp.com",
-    projectId: "TU_PROYECTO",
-    storageBucket: "TU_PROYECTO.appspot.com",
-    messagingSenderId: "TU_SENDER_ID",
-    appId: "TU_APP_ID"
+    apiKey: "AIzaSyAkmPu1YR7JfrASRebvXjiGPSPQgThlQms",
+    authDomain: "notifast-2cfdb.firebaseapp.com",
+    projectId: "notifast-2cfdb",
+    storageBucket: "notifast-2cfdb.firebasestorage.app",
+    messagingSenderId: "219642603892",
+    appId: "1:219642603892:web:b4e6626dd51b487f4a6421"
 }
 
 firebase.initializeApp(config_firebase)
