@@ -17,11 +17,11 @@
 
     <main class="contenido">
         <nav class="tabs">
-            <button class="tab activo" data-tab="mozos">Mozos</button>
+            <button class="tab activo" data-tab="usuarios">Usuarios</button>
             <button class="tab" data-tab="historial">Historial</button>
         </nav>
 
-        <section id="panel-mozos" class="panel activo">
+        <section id="panel-usuarios" class="panel activo">
             <div class="tarjeta">
                 <h2>Agregar usuario</h2>
                 <form id="form-nuevo">
@@ -32,6 +32,7 @@
                             <option value="cocina">Cocina</option>
                             <option value="barra">Barra</option>
                             <option value="caja">Caja</option>
+                            <option value="admin">Admin</option>
                         </select>
                     </div>
                     <div class="fila-form">
@@ -44,8 +45,8 @@
             </div>
 
             <div class="tarjeta">
-                <h2>Mozos registrados</h2>
-                <div id="lista-mozos" class="lista-mozos">
+                <h2>Usuarios registrados</h2>
+                <div id="lista-usuarios" class="lista-usuarios">
                     <p class="estado-vacio">Cargando...</p>
                 </div>
             </div>
@@ -60,6 +61,20 @@
             </div>
         </section>
     </main>
+
+    <div id="modal-editar" class="modal-overlay oculto">
+        <div class="modal-caja">
+            <h3 class="modal-titulo">Modificar usuario</h3>
+            <div class="campo-modal">
+                <label>Nombre</label>
+                <input type="text" id="edit-nombre" placeholder="Nombre completo">
+            </div>
+            <div class="acciones-modal">
+                <button id="btn-cancelar-edit" class="btn-modal-cancel">Cancelar</button>
+                <button id="btn-guardar-edit" class="btn-modal-ok">Guardar</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>

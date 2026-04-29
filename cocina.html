@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NotiFast — Cocina</title>
+    <title>NotiFast — Panel</title>
     <link rel="stylesheet" href="css/cocina.css">
 </head>
 <body>
@@ -17,8 +17,8 @@
 
     <main class="contenido">
         <p class="titulo-llamar">¿A quién llamar?</p>
-        <div id="grilla-mozos" class="grilla-mozos">
-            <p class="estado-vacio">Cargando mozos...</p>
+        <div id="grilla-usuarios" class="grilla-usuarios">
+            <p class="estado-vacio">Cargando...</p>
         </div>
     </main>
 
@@ -26,9 +26,18 @@
         <span id="texto-enviada">✓ Alerta enviada</span>
     </div>
 
+    <div id="pantalla-alerta" class="pantalla-alerta oculto" role="alert" aria-live="assertive">
+        <div class="icono-alerta">!</div>
+        <p class="label-origen">TE LLAMAN DESDE</p>
+        <h2 id="origen-alerta" class="origen-alerta">COCINA</h2>
+        <p id="nombre-alerta" class="nombre-alerta"></p>
+        <button id="btn-confirmar" class="btn-confirmar">Confirmar</button>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
     <script src="js/cocina.js"></script>
 </body>
 </html>

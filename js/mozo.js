@@ -7,24 +7,30 @@ const config_firebase = {
     appId: "1:219642603892:web:b4e6626dd51b487f4a6421"
 }
 
+const VAPID_KEY = 'BLRRlbTtLupCY_TM2MZkgWItgjyEscEMGMaNvHf9OOVo4lbhU4zvZKk3nrOlCxSFqPzUoS4nmcv1YqYykm1tmlw'
+
 firebase.initializeApp(config_firebase)
-const auth = firebase.auth()
-const db = firebase.firestore()
+const auth      = firebase.auth()
+const db        = firebase.firestore()
+const mensajeria = firebase.messaging()
 
 const pantalla_espera = document.getElementById('pantalla-espera')
 const pantalla_alerta = document.getElementById('pantalla-alerta')
-const nombre_mozo = document.getElementById('nombre-mozo')
-const origen_alerta = document.getElementById('origen-alerta')
-const btn_confirmar = document.getElementById('btn-confirmar')
-const btn_salir = document.getElementById('btn-salir')
+const nombre_mozo     = document.getElementById('nombre-mozo')
+const origen_alerta   = document.getElementById('origen-alerta')
+const nombre_alerta   = document.getElementById('nombre-alerta')
+const btn_confirmar   = document.getElementById('btn-confirmar')
+const btn_salir       = document.getElementById('btn-salir')
 
-let alerta_activa = null
+let alerta_activa    = null
 let listener_alertas = null
-let cola_alertas = []
-let procesando = false
+let cola_alertas     = []
+let procesando       = false
+let wake_lock        = null
 
 btn_salir.addEventListener('click', () => {
     if (listener_alertas) listener_alertas()
+    if (wake_lock) wake_lock.release()
     auth.signOut().then(() => window.location.href = 'index.html')
 })
 
@@ -39,10 +45,7 @@ btn_confirmar.addEventListener('click', () => {
 })
 
 auth.onAuthStateChanged(usuario => {
-    if (!usuario) {
-        window.location.href = 'index.html'
-        return
-    }
+    if (!usuario) { window.location.href = 'index.html'; return }
     db.collection('usuarios').doc(usuario.uid).get().then(doc => {
         if (!doc.exists || (doc.data().rol || '').toLowerCase() !== 'mozo') {
             auth.signOut()
@@ -51,14 +54,42 @@ auth.onAuthStateChanged(usuario => {
         }
         nombre_mozo.textContent = doc.data().nombre
     })
-    pedir_permiso()
+    activar_wake_lock()
+    registrar_fcm(usuario.uid)
     escuchar_alertas(usuario.uid)
 })
 
-function pedir_permiso() {
+async function activar_wake_lock() {
+    if (!('wakeLock' in navigator)) return
+    try {
+        wake_lock = await navigator.wakeLock.request('screen')
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState === 'visible' && !wake_lock) {
+                wake_lock = await navigator.wakeLock.request('screen').catch(() => null)
+            }
+        })
+    } catch {}
+}
+
+function registrar_fcm(uid) {
+    if (!('serviceWorker' in navigator)) return
     if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission()
+        Notification.requestPermission().then(permiso => {
+            if (permiso === 'granted') obtener_token(uid)
+        })
+    } else if (Notification.permission === 'granted') {
+        obtener_token(uid)
     }
+}
+
+function obtener_token(uid) {
+    navigator.serviceWorker.register('/firebase-messaging-sw.js').then(registro => {
+        mensajeria.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: registro })
+            .then(token => {
+                if (token) db.collection('usuarios').doc(uid).update({ token_fcm: token })
+            })
+            .catch(() => {})
+    }).catch(() => {})
 }
 
 function escuchar_alertas(uid) {
@@ -75,35 +106,20 @@ function escuchar_alertas(uid) {
 }
 
 function procesar_siguiente() {
-    if (cola_alertas.length === 0) {
-        procesando = false
-        return
-    }
+    if (cola_alertas.length === 0) { procesando = false; return }
     procesando = true
     const alerta = cola_alertas.shift()
     alerta_activa = alerta.id
-    mostrar_alerta(alerta.origen)
+    mostrar_alerta(alerta.origen, alerta.nombre_origen || alerta.origen)
 }
 
-function mostrar_alerta(origen) {
+function mostrar_alerta(origen, nombre_orig) {
     origen_alerta.textContent = origen.toUpperCase()
+    nombre_alerta.textContent = nombre_orig
     pantalla_alerta.classList.remove('oculto')
     vibrar()
-    notificar(origen)
 }
 
 function vibrar() {
-    if ('vibrate' in navigator) {
-        navigator.vibrate([400, 100, 400, 100, 400])
-    }
-}
-
-function notificar(origen) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('NotiFast', {
-            body: `Te llaman desde ${origen}`,
-            tag: 'alerta',
-            renotify: true
-        })
-    }
+    if ('vibrate' in navigator) navigator.vibrate([400, 100, 400, 100, 400])
 }

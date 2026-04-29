@@ -1,0 +1,8 @@
+{
+  "name": "notifast",
+  "version": "1.0.0",
+  "engines": { "node": "18.x" },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}
