@@ -7,7 +7,7 @@ const config_firebase = {
     appId: "1:219642603892:web:b4e6626dd51b487f4a6421"
 }
 
-const VAPID_KEY = 'TU_VAPID_KEY'
+const VAPID_KEY = 'BLRRlbTtLupCY_TM2MZkgWItgjyEscEMGMaNvHf9OOVo4lbhU4zvZKk3nrOlCxSFqPzUoS4nmcv1YqYykm1tmlw'
 
 firebase.initializeApp(config_firebase)
 const auth      = firebase.auth()
