@@ -32,7 +32,7 @@ let intervalo_vibracion = null
 btn_salir.addEventListener('click', () => {
     if (listener_alertas) listener_alertas()
     if (wake_lock) wake_lock.release()
-    auth.signOut().then(() => window.location.href = 'index.html')
+    auth.signOut().then(() => window.location.replace('index.html'))
 })
 
 btn_confirmar.addEventListener('click', () => {
@@ -47,11 +47,11 @@ btn_confirmar.addEventListener('click', () => {
 })
 
 auth.onAuthStateChanged(usuario => {
-    if (!usuario) { window.location.href = 'index.html'; return }
+    if (!usuario) { window.location.replace('index.html'); return }
     db.collection('usuarios').doc(usuario.uid).get().then(doc => {
         if (!doc.exists || (doc.data().rol || '').toLowerCase() !== 'mozo') {
             auth.signOut()
-            window.location.href = 'index.html'
+            window.location.replace('index.html')
             return
         }
         nombre_mozo.textContent = doc.data().nombre
@@ -124,6 +124,7 @@ function mostrar_alerta(origen, nombre_orig) {
 
 function vibrar_continuo() {
     if (!('vibrate' in navigator)) return
+    detener_vibracion()
     const patron = [700, 250, 700, 250, 700, 600]
     navigator.vibrate(patron)
     intervalo_vibracion = setInterval(() => navigator.vibrate(patron), 3200)

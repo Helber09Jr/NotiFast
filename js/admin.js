@@ -40,11 +40,11 @@ const colores_rol = {
 let uid_editando = null
 
 auth.onAuthStateChanged(usuario => {
-    if (!usuario) { window.location.href = 'index.html'; return }
+    if (!usuario) { window.location.replace('index.html'); return }
     db.collection('usuarios').doc(usuario.uid).get().then(doc => {
         if (!doc.exists || (doc.data().rol || '').toLowerCase() !== 'admin') {
             auth.signOut()
-            window.location.href = 'index.html'
+            window.location.replace('index.html')
         }
     })
     cargar_usuarios()
@@ -52,7 +52,7 @@ auth.onAuthStateChanged(usuario => {
 })
 
 btn_salir.addEventListener('click', () => {
-    auth.signOut().then(() => window.location.href = 'index.html')
+    auth.signOut().then(() => window.location.replace('index.html'))
 })
 
 document.querySelectorAll('.tab').forEach(tab => {

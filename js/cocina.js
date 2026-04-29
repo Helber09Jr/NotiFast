@@ -50,7 +50,7 @@ let intervalo_vibracion = null
 
 btn_salir.addEventListener('click', () => {
     if (listener_alertas) listener_alertas()
-    auth.signOut().then(() => window.location.href = 'index.html')
+    auth.signOut().then(() => window.location.replace('index.html'))
 })
 
 btn_confirmar.addEventListener('click', () => {
@@ -65,13 +65,13 @@ btn_confirmar.addEventListener('click', () => {
 })
 
 auth.onAuthStateChanged(usuario => {
-    if (!usuario) { window.location.href = 'index.html'; return }
+    if (!usuario) { window.location.replace('index.html'); return }
     uid_usuario = usuario.uid
     db.collection('usuarios').doc(usuario.uid).get().then(doc => {
-        if (!doc.exists) { window.location.href = 'index.html'; return }
+        if (!doc.exists) { window.location.replace('index.html'); return }
         const rol = (doc.data().rol || '').toLowerCase()
         if (!['cocina', 'barra', 'caja'].includes(rol)) {
-            window.location.href = 'index.html'
+            window.location.replace('index.html')
             return
         }
         origen_usuario = rol
@@ -215,6 +215,7 @@ function mostrar_alerta_entrante(origen, nombre) {
 
 function vibrar_continuo() {
     if (!('vibrate' in navigator)) return
+    detener_vibracion()
     const patron = [700, 250, 700, 250, 700, 600]
     navigator.vibrate(patron)
     intervalo_vibracion = setInterval(() => navigator.vibrate(patron), 3200)

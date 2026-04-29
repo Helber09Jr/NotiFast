@@ -9,13 +9,14 @@ const config_firebase = {
 
 firebase.initializeApp(config_firebase)
 const auth = firebase.auth()
-const db = firebase.firestore()
+const db   = firebase.firestore()
 
-const form_login = document.getElementById('form-login')
+const form_login  = document.getElementById('form-login')
 const email_input = document.getElementById('email-input')
-const pass_input = document.getElementById('pass-input')
+const pass_input  = document.getElementById('pass-input')
 const btn_ingresar = document.getElementById('btn-ingresar')
-const error_login = document.getElementById('error-login')
+const error_login  = document.getElementById('error-login')
+const cargando     = document.getElementById('cargando')
 
 const destinos = {
     admin:  'admin.html',
@@ -35,26 +36,33 @@ function mostrar_error(texto) {
     restaurar_btn()
 }
 
+function mostrar_form() {
+    cargando.classList.add('oculto')
+}
+
 auth.onAuthStateChanged(usuario => {
-    if (!usuario) return
+    if (!usuario) { mostrar_form(); return }
     db.collection('usuarios').doc(usuario.uid).get()
         .then(doc => {
             if (!doc.exists) {
                 auth.signOut()
+                mostrar_form()
                 mostrar_error('Usuario sin perfil. Pedile al admin que te registre.')
                 return
             }
             const rol = (doc.data().rol || '').toLowerCase()
             if (!destinos[rol]) {
                 auth.signOut()
+                mostrar_form()
                 mostrar_error('Rol no reconocido: ' + rol)
                 return
             }
-            window.location.href = destinos[rol]
+            window.location.replace(destinos[rol])
         })
         .catch(err => {
             auth.signOut()
-            mostrar_error('Error al verificar permisos (' + err.code + '). Revisá las reglas de Firestore.')
+            mostrar_form()
+            mostrar_error('Error al verificar permisos (' + err.code + ').')
             restaurar_btn()
         })
 })
