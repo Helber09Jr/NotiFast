@@ -14,29 +14,40 @@ const db = firebase.firestore()
 const app_aux = firebase.initializeApp(config_firebase, 'auxiliar')
 const auth_aux = app_aux.auth()
 
-const btn_salir = document.getElementById('btn-salir')
-const form_nuevo = document.getElementById('form-nuevo')
-const nombre_nuevo = document.getElementById('nombre-nuevo')
-const rol_nuevo = document.getElementById('rol-nuevo')
-const email_nuevo = document.getElementById('email-nuevo')
-const pass_nuevo = document.getElementById('pass-nuevo')
-const btn_crear = document.getElementById('btn-crear')
-const msg_crear = document.getElementById('msg-crear')
-const lista_mozos = document.getElementById('lista-mozos')
-const lista_alertas = document.getElementById('lista-alertas')
+const btn_salir       = document.getElementById('btn-salir')
+const form_nuevo      = document.getElementById('form-nuevo')
+const nombre_nuevo    = document.getElementById('nombre-nuevo')
+const rol_nuevo       = document.getElementById('rol-nuevo')
+const email_nuevo     = document.getElementById('email-nuevo')
+const pass_nuevo      = document.getElementById('pass-nuevo')
+const btn_crear       = document.getElementById('btn-crear')
+const msg_crear       = document.getElementById('msg-crear')
+const lista_usuarios  = document.getElementById('lista-usuarios')
+const lista_alertas   = document.getElementById('lista-alertas')
+const modal_editar    = document.getElementById('modal-editar')
+const edit_nombre     = document.getElementById('edit-nombre')
+const btn_guardar_edit  = document.getElementById('btn-guardar-edit')
+const btn_cancelar_edit = document.getElementById('btn-cancelar-edit')
+
+const colores_rol = {
+    mozo:   '#FF6B00',
+    cocina: '#AB47BC',
+    barra:  '#42A5F5',
+    caja:   '#66BB6A',
+    admin:  '#78909C'
+}
+
+let uid_editando = null
 
 auth.onAuthStateChanged(usuario => {
-    if (!usuario) {
-        window.location.href = 'index.html'
-        return
-    }
+    if (!usuario) { window.location.href = 'index.html'; return }
     db.collection('usuarios').doc(usuario.uid).get().then(doc => {
         if (!doc.exists || (doc.data().rol || '').toLowerCase() !== 'admin') {
             auth.signOut()
             window.location.href = 'index.html'
         }
     })
-    cargar_mozos()
+    cargar_usuarios()
     cargar_historial()
 })
 
@@ -53,6 +64,21 @@ document.querySelectorAll('.tab').forEach(tab => {
     })
 })
 
+btn_cancelar_edit.addEventListener('click', cerrar_modal)
+modal_editar.addEventListener('click', e => { if (e.target === modal_editar) cerrar_modal() })
+
+btn_guardar_edit.addEventListener('click', () => {
+    if (!uid_editando) return
+    const nombre = edit_nombre.value.trim()
+    if (!nombre) return
+    db.collection('usuarios').doc(uid_editando).update({ nombre }).then(() => {
+        db.collection('mozos').doc(uid_editando).get().then(doc => {
+            if (doc.exists) doc.ref.update({ nombre })
+        })
+        cerrar_modal()
+    })
+})
+
 form_nuevo.addEventListener('submit', e => {
     e.preventDefault()
     msg_crear.textContent = ''
@@ -61,9 +87,9 @@ form_nuevo.addEventListener('submit', e => {
     btn_crear.textContent = 'Creando...'
 
     const nombre = nombre_nuevo.value.trim()
-    const rol = rol_nuevo.value
-    const email = email_nuevo.value.trim()
-    const clave = pass_nuevo.value
+    const rol    = rol_nuevo.value
+    const email  = email_nuevo.value.trim()
+    const clave  = pass_nuevo.value
 
     auth_aux.createUserWithEmailAndPassword(email, clave)
         .then(cred => {
@@ -93,35 +119,82 @@ form_nuevo.addEventListener('submit', e => {
         })
 })
 
-function cargar_mozos() {
-    db.collection('mozos').onSnapshot(snap => {
-        lista_mozos.innerHTML = ''
+function cargar_usuarios() {
+    db.collection('usuarios').onSnapshot(snap => {
+        lista_usuarios.innerHTML = ''
         if (snap.empty) {
-            lista_mozos.innerHTML = '<p class="estado-vacio">No hay mozos registrados.</p>'
+            lista_usuarios.innerHTML = '<p class="estado-vacio">No hay usuarios registrados.</p>'
             return
         }
         snap.forEach(doc => {
-            const datos = doc.data()
+            const datos  = doc.data()
+            const rol    = (datos.rol || 'sin rol').toLowerCase()
+            const color  = colores_rol[rol] || '#888'
+            const inicial = (datos.nombre || '?').charAt(0).toUpperCase()
+
             const item = document.createElement('div')
-            item.className = 'item-mozo'
+            item.className = 'item-usuario'
             item.innerHTML = `
-                <div class="info-mozo">
-                    <span class="nombre-item">${datos.nombre}</span>
-                    <span class="rol-item">Mozo</span>
+                <div class="avatar-usuario" style="background:${color}1A;color:${color}">
+                    ${inicial}
                 </div>
-                <button class="btn-eliminar" data-id="${doc.id}">Eliminar</button>
+                <div class="info-usuario">
+                    <span class="nombre-item">${datos.nombre || '—'}</span>
+                    <span class="badge-rol" style="background:${color}1A;color:${color}">${rol}</span>
+                </div>
+                <div class="acciones-usuario">
+                    <select class="select-rol">
+                        <option value="mozo"   ${rol === 'mozo'   ? 'selected' : ''}>Mozo</option>
+                        <option value="cocina" ${rol === 'cocina' ? 'selected' : ''}>Cocina</option>
+                        <option value="barra"  ${rol === 'barra'  ? 'selected' : ''}>Barra</option>
+                        <option value="caja"   ${rol === 'caja'   ? 'selected' : ''}>Caja</option>
+                        <option value="admin"  ${rol === 'admin'  ? 'selected' : ''}>Admin</option>
+                    </select>
+                    <button class="btn-accion btn-editar-u" title="Editar nombre">✏</button>
+                    <button class="btn-accion btn-eliminar-u" title="Eliminar">✕</button>
+                </div>
             `
-            item.querySelector('.btn-eliminar').addEventListener('click', () => eliminar_mozo(doc.id, datos.nombre))
-            lista_mozos.appendChild(item)
+
+            item.querySelector('.select-rol').addEventListener('change', e => {
+                cambiar_rol(doc.id, rol, e.target.value, datos.nombre)
+            })
+            item.querySelector('.btn-editar-u').addEventListener('click', () => {
+                abrir_modal(doc.id, datos.nombre)
+            })
+            item.querySelector('.btn-eliminar-u').addEventListener('click', () => {
+                eliminar_usuario(doc.id, datos.nombre, rol)
+            })
+
+            lista_usuarios.appendChild(item)
         })
     })
 }
 
-function eliminar_mozo(mozo_id, nombre) {
+function cambiar_rol(uid, rol_viejo, rol_nuevo, nombre) {
+    const lote = db.batch()
+    lote.update(db.collection('usuarios').doc(uid), { rol: rol_nuevo })
+    if (rol_viejo === 'mozo') lote.delete(db.collection('mozos').doc(uid))
+    if (rol_nuevo === 'mozo') lote.set(db.collection('mozos').doc(uid), { nombre, activo: true })
+    lote.commit()
+}
+
+function abrir_modal(uid, nombre) {
+    uid_editando    = uid
+    edit_nombre.value = nombre || ''
+    modal_editar.classList.remove('oculto')
+    edit_nombre.focus()
+}
+
+function cerrar_modal() {
+    uid_editando = null
+    modal_editar.classList.add('oculto')
+}
+
+function eliminar_usuario(uid, nombre, rol) {
     if (!confirm(`¿Eliminar a ${nombre}?`)) return
     const lote = db.batch()
-    lote.delete(db.collection('mozos').doc(mozo_id))
-    lote.delete(db.collection('usuarios').doc(mozo_id))
+    lote.delete(db.collection('usuarios').doc(uid))
+    if (rol === 'mozo') lote.delete(db.collection('mozos').doc(uid))
     lote.commit()
 }
 
@@ -137,15 +210,15 @@ function cargar_historial() {
             }
             snap.forEach(doc => {
                 const datos = doc.data()
-                const hora = datos.marca_tiempo
+                const hora  = datos.marca_tiempo
                     ? datos.marca_tiempo.toDate().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })
                     : '--:--'
                 const item = document.createElement('div')
                 item.className = 'item-alerta'
                 item.innerHTML = `
                     <div class="detalle-alerta">
-                        <span class="nombre-alerta">${datos.nombre_mozo || 'Mozo'}</span>
-                        <span class="sub-alerta">llamado desde <strong>${datos.origen}</strong></span>
+                        <span class="nombre-alerta">${datos.nombre_mozo || 'Usuario'}</span>
+                        <span class="sub-alerta">llamado por <strong>${datos.nombre_origen || datos.origen}</strong></span>
                     </div>
                     <div class="meta-alerta">
                         <span class="badge-origen badge-${datos.origen}">${datos.origen}</span>
