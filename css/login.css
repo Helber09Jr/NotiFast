@@ -6,7 +6,10 @@
 
 :root {
     --naranja: #FF6B00;
-    --oscuro: #1A1A2E;
+    --oscuro: #0D0D1A;
+    --card: #14142A;
+    --borde: rgba(255, 255, 255, 0.08);
+    --texto: #D0D0E0;
     --rojo: #E94560;
     --blanco: #FFFFFF;
 }
@@ -18,66 +21,111 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    background-image:
+        radial-gradient(ellipse at 50% -10%, rgba(255, 107, 0, 0.12) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 110%, rgba(171, 71, 188, 0.06) 0%, transparent 45%);
+}
+
+.cargando-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--oscuro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 0.35s ease;
+}
+
+.cargando-overlay.oculto {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(255, 107, 0, 0.18);
+    border-top-color: var(--naranja);
+    border-radius: 50%;
+    animation: girar 0.7s linear infinite;
+}
+
+@keyframes girar {
+    to { transform: rotate(360deg); }
 }
 
 .contenedor-login {
     width: 100%;
-    max-width: 420px;
+    max-width: 400px;
     padding: 20px;
 }
 
 .tarjeta-login {
-    background: var(--blanco);
-    border-radius: 20px;
-    padding: 40px 32px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    background: var(--card);
+    border: 1px solid var(--borde);
+    border-radius: 24px;
+    padding: 44px 36px;
+    box-shadow:
+        0 0 0 1px rgba(255, 107, 0, 0.04),
+        0 24px 80px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .marca {
     text-align: center;
-    margin-bottom: 36px;
+    margin-bottom: 40px;
 }
 
 .logo-texto {
     font-size: 2.8rem;
     font-weight: 900;
     color: var(--naranja);
-    letter-spacing: -1px;
+    letter-spacing: -2px;
+    line-height: 1;
 }
 
 .autor {
-    font-size: 0.82rem;
-    color: #bbb;
-    margin-top: 4px;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.2);
+    margin-top: 6px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .campo-form {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .campo-form label {
     display: block;
-    font-size: 0.82rem;
+    font-size: 0.7rem;
     font-weight: 700;
-    color: var(--oscuro);
-    margin-bottom: 6px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 8px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1.2px;
 }
 
 .campo-form input {
     width: 100%;
-    padding: 13px 16px;
-    border: 2px solid #E5E5E5;
-    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
     font-size: 1rem;
     outline: none;
-    transition: border-color 0.2s;
-    color: var(--oscuro);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    color: var(--texto);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.campo-form input::placeholder {
+    color: rgba(255, 255, 255, 0.15);
 }
 
 .campo-form input:focus {
-    border-color: var(--naranja);
+    border-color: rgba(255, 107, 0, 0.45);
+    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.08);
 }
 
 #btn-ingresar {
@@ -86,17 +134,19 @@ body {
     background: var(--naranja);
     color: var(--blanco);
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 1rem;
     font-weight: 800;
     cursor: pointer;
-    transition: transform 0.1s, background 0.2s;
-    margin-top: 8px;
-    letter-spacing: 0.5px;
+    transition: transform 0.1s, box-shadow 0.2s, background 0.15s;
+    margin-top: 12px;
+    letter-spacing: 0.3px;
+    box-shadow: 0 6px 24px rgba(255, 107, 0, 0.35);
 }
 
 #btn-ingresar:hover {
-    background: #e05f00;
+    background: #FF7A1A;
+    box-shadow: 0 8px 32px rgba(255, 107, 0, 0.5);
 }
 
 #btn-ingresar:active {
@@ -104,13 +154,15 @@ body {
 }
 
 #btn-ingresar:disabled {
-    background: #ccc;
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.2);
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 .mensaje-error {
     color: var(--rojo);
-    font-size: 0.85rem;
+    font-size: 0.84rem;
     text-align: center;
     margin-top: 14px;
     min-height: 18px;
