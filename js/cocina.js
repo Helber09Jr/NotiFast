@@ -38,14 +38,15 @@ const etiquetas_rol = {
     cocina: 'Cocina'
 }
 
-let origen_usuario  = 'cocina'
-let nombre_usuario  = ''
-let uid_usuario     = null
-let timer_notif     = null
-let alerta_activa   = null
-let listener_alertas = null
-let cola_alertas    = []
-let procesando      = false
+let origen_usuario      = 'cocina'
+let nombre_usuario      = ''
+let uid_usuario         = null
+let timer_notif         = null
+let alerta_activa       = null
+let listener_alertas    = null
+let cola_alertas        = []
+let procesando          = false
+let intervalo_vibracion = null
 
 btn_salir.addEventListener('click', () => {
     if (listener_alertas) listener_alertas()
@@ -54,6 +55,7 @@ btn_salir.addEventListener('click', () => {
 
 btn_confirmar.addEventListener('click', () => {
     if (!alerta_activa) return
+    detener_vibracion()
     db.collection('alertas').doc(alerta_activa).update({ leida: true }).then(() => {
         alerta_activa = null
         pantalla_alerta.classList.add('oculto')
@@ -208,5 +210,18 @@ function mostrar_alerta_entrante(origen, nombre) {
     origen_alerta.textContent = origen.toUpperCase()
     nombre_alerta.textContent = nombre
     pantalla_alerta.classList.remove('oculto')
-    if ('vibrate' in navigator) navigator.vibrate([400, 100, 400, 100, 400])
+    vibrar_continuo()
+}
+
+function vibrar_continuo() {
+    if (!('vibrate' in navigator)) return
+    const patron = [700, 250, 700, 250, 700, 600]
+    navigator.vibrate(patron)
+    intervalo_vibracion = setInterval(() => navigator.vibrate(patron), 3200)
+}
+
+function detener_vibracion() {
+    clearInterval(intervalo_vibracion)
+    intervalo_vibracion = null
+    if ('vibrate' in navigator) navigator.vibrate(0)
 }
