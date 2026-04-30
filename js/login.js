@@ -47,7 +47,7 @@ auth.onAuthStateChanged(usuario => {
             if (!doc.exists) {
                 auth.signOut()
                 mostrar_form()
-                mostrar_error('Usuario sin perfil. Pedile al admin que te registre.')
+                mostrar_error('Perfil no encontrado. El admin debe verificar las reglas de Firestore y recrear el usuario.')
                 return
             }
             const rol = (doc.data().rol || '').toLowerCase()

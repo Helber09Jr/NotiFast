@@ -91,25 +91,35 @@ form_nuevo.addEventListener('submit', e => {
     const email  = email_nuevo.value.trim()
     const clave  = pass_nuevo.value
 
+    let uid_nuevo = null
+
     auth_aux.createUserWithEmailAndPassword(email, clave)
         .then(cred => {
-            const uid = cred.user.uid
+            uid_nuevo = cred.user.uid
             const lote = db.batch()
-            lote.set(db.collection('usuarios').doc(uid), { nombre, rol })
+            lote.set(db.collection('usuarios').doc(uid_nuevo), { nombre, rol })
             if (rol === 'mozo') {
-                lote.set(db.collection('mozos').doc(uid), { nombre, activo: true })
+                lote.set(db.collection('mozos').doc(uid_nuevo), { nombre, activo: true })
             }
-            return lote.commit().then(() => auth_aux.signOut())
+            return lote.commit()
         })
+        .then(() => auth_aux.signOut())
         .then(() => {
             msg_crear.textContent = 'Usuario creado correctamente.'
             msg_crear.className = 'mensaje-estado ok'
             form_nuevo.reset()
+            uid_nuevo = null
         })
         .catch(err => {
-            const texto = err.code === 'auth/email-already-in-use'
-                ? 'El correo ya está registrado.'
-                : 'Error al crear el usuario.'
+            auth_aux.signOut().catch(() => {})
+            let texto
+            if (err.code === 'auth/email-already-in-use') {
+                texto = 'El correo ya está registrado.'
+            } else if (uid_nuevo) {
+                texto = 'Auth creado pero Firestore falló — actualizá las reglas de Firestore y eliminá este usuario desde Firebase Console antes de reintentar.'
+            } else {
+                texto = 'Error al crear el usuario: ' + (err.message || err.code || err)
+            }
             msg_crear.textContent = texto
             msg_crear.className = 'mensaje-estado error'
         })
