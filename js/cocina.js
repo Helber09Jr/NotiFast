@@ -84,6 +84,21 @@ auth.onAuthStateChanged(usuario => {
 })
 
 function registrar_fcm() {
+    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+        const Push = window.Capacitor.Plugins.PushNotifications
+        Push.requestPermissions().then(r => {
+            if (r.receive === 'granted') Push.register()
+        })
+        Push.addListener('registration', tok => {
+            if (uid_usuario) db.collection('usuarios').doc(uid_usuario).update({ token_fcm: tok.value })
+        })
+        Push.addListener('pushNotificationReceived', notif => {
+            const origen = (notif.data && notif.data.origen) || 'llamada'
+            const nombre = (notif.data && notif.data.nombre_origen) || ''
+            mostrar_alerta_entrante(origen, nombre)
+        })
+        return
+    }
     if (!('serviceWorker' in navigator)) return
     navigator.serviceWorker.register('/firebase-messaging-sw.js').then(registro => {
         mensajeria.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: registro })
@@ -173,7 +188,9 @@ function enviar_push(token_fcm, nombre_destino) {
         body: JSON.stringify({
             token_fcm,
             titulo: 'NotiFast — Te llaman',
-            cuerpo: `${nombre_usuario} (${origen_usuario}) llama a ${nombre_destino}`
+            cuerpo: `${nombre_usuario} (${origen_usuario}) llama a ${nombre_destino}`,
+            origen: origen_usuario,
+            nombre_origen: nombre_usuario
         })
     }).catch(() => {})
 }

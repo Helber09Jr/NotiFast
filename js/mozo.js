@@ -74,6 +74,21 @@ async function activar_wake_lock() {
 }
 
 function registrar_fcm(uid) {
+    if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+        const Push = window.Capacitor.Plugins.PushNotifications
+        Push.requestPermissions().then(r => {
+            if (r.receive === 'granted') Push.register()
+        })
+        Push.addListener('registration', tok => {
+            db.collection('usuarios').doc(uid).update({ token_fcm: tok.value })
+        })
+        Push.addListener('pushNotificationReceived', notif => {
+            const origen = (notif.data && notif.data.origen) || 'llamada'
+            const nombre_orig = (notif.data && notif.data.nombre_origen) || ''
+            mostrar_alerta(origen, nombre_orig)
+        })
+        return
+    }
     if (!('serviceWorker' in navigator)) return
     if ('Notification' in window && Notification.permission === 'default') {
         Notification.requestPermission().then(permiso => {

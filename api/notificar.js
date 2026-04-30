@@ -18,7 +18,7 @@ module.exports = async function(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end()
     if (req.method !== 'POST') return res.status(405).end()
 
-    const { token_fcm, titulo, cuerpo } = req.body
+    const { token_fcm, titulo, cuerpo, origen, nombre_origen } = req.body
     if (!token_fcm) return res.status(400).json({ error: 'token_fcm requerido' })
 
     const titulo_final = titulo || 'NotiFast — Te llaman'
@@ -27,6 +27,12 @@ module.exports = async function(req, res) {
     try {
         const resultado = await admin.messaging().send({
             token: token_fcm,
+            data: {
+                origen:        origen        || '',
+                nombre_origen: nombre_origen || '',
+                titulo:        titulo_final,
+                cuerpo:        cuerpo_final
+            },
             webpush: {
                 headers: { Urgency: 'high' },
                 notification: {

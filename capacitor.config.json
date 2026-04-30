@@ -1,0 +1,15 @@
+{
+  "appId": "com.hjunior.notifast",
+  "appName": "NotiFast",
+  "webDir": ".",
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
+}
