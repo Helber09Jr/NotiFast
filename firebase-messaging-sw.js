@@ -13,15 +13,22 @@ firebase.initializeApp({
 const mensajeria = firebase.messaging()
 
 mensajeria.onBackgroundMessage(payload => {
-    self.registration.showNotification(payload.notification.title, {
-        body: payload.notification.body,
+    const titulo = (payload.notification && payload.notification.title)
+        || (payload.data && payload.data.titulo)
+        || 'NotiFast — Te llaman'
+    const cuerpo = (payload.notification && payload.notification.body)
+        || (payload.data && payload.data.cuerpo)
+        || 'Tienes una nueva alerta'
+
+    return self.registration.showNotification(titulo, {
+        body: cuerpo,
         icon: '/icon-192.png',
         badge: '/icon-192.png',
         vibrate: [400, 100, 400, 100, 400, 100, 400],
         tag: 'notifast-alerta',
         renotify: true,
         requireInteraction: true,
-        data: payload.data
+        silent: false
     })
 })
 
@@ -30,7 +37,7 @@ self.addEventListener('notificationclick', e => {
     e.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(lista => {
             for (const cliente of lista) {
-                if (cliente.url.includes('noti-fast') && 'focus' in cliente) return cliente.focus()
+                if ('focus' in cliente) return cliente.focus()
             }
             return clients.openWindow('/')
         })

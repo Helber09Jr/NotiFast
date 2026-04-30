@@ -21,24 +21,44 @@ module.exports = async function(req, res) {
     const { token_fcm, titulo, cuerpo } = req.body
     if (!token_fcm) return res.status(400).json({ error: 'token_fcm requerido' })
 
+    const titulo_final = titulo || 'NotiFast — Te llaman'
+    const cuerpo_final = cuerpo || 'Nueva alerta'
+
     try {
-        await admin.messaging().send({
+        const resultado = await admin.messaging().send({
             token: token_fcm,
-            notification: {
-                title: titulo || 'NotiFast',
-                body: cuerpo || 'Nueva alerta'
+            webpush: {
+                headers: { Urgency: 'high' },
+                notification: {
+                    title: titulo_final,
+                    body: cuerpo_final,
+                    icon: '/icon-192.png',
+                    badge: '/icon-192.png',
+                    vibrate: [400, 100, 400, 100, 400, 100, 400],
+                    requireInteraction: true,
+                    tag: 'notifast-alerta',
+                    renotify: true,
+                    silent: false
+                },
+                fcmOptions: { link: '/' }
             },
             android: {
                 priority: 'high',
-                notification: { channelId: 'notifast', sound: 'default' }
+                notification: {
+                    channelId: 'notifast',
+                    sound: 'default',
+                    priority: 'max',
+                    vibrateTimingsMillis: [400, 100, 400, 100, 400]
+                }
             },
             apns: {
-                payload: { aps: { sound: 'default', badge: 1 } },
-                headers: { 'apns-priority': '10' }
+                headers: { 'apns-priority': '10', 'apns-push-type': 'alert' },
+                payload: { aps: { sound: 'default', badge: 1 } }
             }
         })
-        res.status(200).json({ ok: true })
+        res.status(200).json({ ok: true, id: resultado })
     } catch (err) {
-        res.status(500).json({ error: err.message })
+        console.error('FCM error:', err.code, err.message)
+        res.status(500).json({ error: err.message, code: err.code })
     }
 }
